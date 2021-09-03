@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import logging
+import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -19,6 +20,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+PORT = int(os.environ.get('PORT', '8443'))
 
 # Определение обработчиков телеграм команд.
 # телеграм команды начинаються со слеша.
@@ -69,6 +72,7 @@ def error(update, context):
 def main():
     """Запуск бота."""
     TOKEN = os.getenv('TOKEN')
+    APP_NAME = os.getenv('APP_NAME')
 
     # Создаем update и передаем ему токен нашего бота.
     # Учтите установить use_context=True чтобы 
@@ -87,10 +91,10 @@ def main():
     dp.add_handler(CommandHandler("author", author))
     dp.add_handler(CommandHandler("link", link))
     # Когда команды на русском языке
-    dp.add_handler(CommandHandler("запуск", start))
-    dp.add_handler(CommandHandler("помощь", help))
-    dp.add_handler(CommandHandler("автор", author))
-    dp.add_handler(CommandHandler("ссылка", link))
+    # dp.add_handler(CommandHandler("запуск", start))
+    # dp.add_handler(CommandHandler("помощь", help))
+    # dp.add_handler(CommandHandler("автор", author))
+    # dp.add_handler(CommandHandler("ссылка", link))
 
     # Когда в телеграме посылаеться не командное сообщение
     dp.add_handler(MessageHandler(Filters.text, echo))
@@ -99,7 +103,10 @@ def main():
     dp.add_error_handler(error)
 
     # Следующая команда запускает бот
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0",
+                          port=PORT,
+                          url_path=TOKEN)
+    updater.bot.set_webhook(APP_NAME + TOKEN)
 
     # Следующая команда останавливает бот безопасно
     updater.idle()
