@@ -6,9 +6,8 @@
 Simple Bot to reply to Telegram messages.
 """
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 import logging
 import os
